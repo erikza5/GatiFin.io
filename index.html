@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GatiFin - Solusi Keuangan Cerdas</title>
+    
+    <!-- CSS Dependencies -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- JS Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root { --primary: #4e73df; --bg-light: #f8f9fc; --sidebar-bg: #2e59d9; }
+        
+        /* --- DARK MODE OPTIMIZATION --- */
+        body.dark-mode { 
+            --bg-light: #121212; 
+            background: var(--bg-light); 
+            color: #ffffff; 
+        }
+        body.dark-mode .sidebar { background: #000000; }
+        body.dark-mode .card, body.dark-mode .modal-content { 
+            background: #1e1e1e; 
+            color: #ffffff; 
+            border: 1px solid #333333; 
+        }
+        body.dark-mode .form-control, 
+        body.dark-mode .form-select { 
+            background: #2d2d2d; 
+            border-color: #444444; 
+            color: #ffffff !important; 
+        }
+        body.dark-mode .text-muted { color: #bbbbbb !important; }
+        body.dark-mode .table { color: #ffffff; border-color: #333333; }
+        body.dark-mode .table-light { background: #2d2d2d; color: #ffffff; }
+
+        /* Navigation Styles */
+        body { background: var(--bg-light); font-family: 'Segoe UI', sans-serif; overflow-x: hidden; transition: background 0.3s; }
+        #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--sidebar-bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .sidebar { min-height: 100vh; background: var(--sidebar-bg); color: white; z-index: 1000; transition: all 0.3s; }
+        .nav-link { color: rgba(255,255,255,0.7); cursor: pointer; border-radius: 10px; margin-bottom: 5px; transition: 0.2s; }
+        .nav-link.active { background: rgba(255,255,255,0.2); color: white; font-weight: bold; }
+        .nav-link:hover { background: rgba(255,255,255,0.1); color: white; transform: translateX(5px); }
+        
+        /* Mobile View Adjustments */
+        @media (max-width: 768px) {
+            .sidebar { min-height: auto; position: relative !important; width: 100% !important; }
+            main { margin-left: 0 !important; width: 100% !important; }
+        }
+
+        /* Snapshot Design */
+        #capture-area { 
+            position: relative;
+            padding: 50px 35px;
+            color: #ffffff !important;
+            text-align: center;
+            overflow: hidden;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-radius: 20px;
+        }
+        .bg-snapshot-dark { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important; }
+        .bg-snapshot-blue { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important; }
+        .glass-card-snapshot { 
+            background: rgba(255, 255, 255, 0.12) !important;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- SECTION: AUTH SCREEN -->
+<div id="auth-screen">
+    <div class="card p-4 shadow-lg animate__animated animate__zoomIn" style="width: 350px;">
+        <div class="text-center mb-4">
+            <h5 class="fw-bold text-primary">GatiFin - Login</h5>
+        </div>
+        <form id="loginForm">
+            <div class="mb-3"><input type="text" id="username" class="form-control" placeholder="Username" required></div>
+            <div class="mb-3"><input type="password" id="password" class="form-control" placeholder="Password" required></div>
+            <button type="submit" class="btn btn-primary w-100 fw-bold">Masuk</button>
+        </form>
+        <div class="text-center mt-3">
+            <i class="bi bi-fingerprint fs-1 text-primary" style="cursor:pointer" onclick="authenticateBiometric()"></i>
+            <p class="small text-muted">Gunakan Biometrik (Simulasi)</p>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid" id="main-app" style="display: none;">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar py-4 position-fixed">
+            <div class="text-center mb-4">
+                <img src="https://via.placeholder.com/80" id="sidebar-img-display" class="rounded-circle mb-2" style="width:70px; height:70px; object-fit:cover;">
+                <div class="fw-bold" id="sidebar-name-display">User</div>
+            </div>
+            <ul class="nav flex-column px-2">
+                <li class="nav-item"><a class="nav-link active" onclick="showMenu('beranda', this)" data-key="nav-home"><i class="bi bi-house-door me-2"></i> Beranda</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="showMenu('tambah', this)" data-key="nav-add"><i class="bi bi-plus-square me-2"></i> Tambah Data</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="showMenu('riwayat', this)" data-key="nav-history"><i class="bi bi-clock-history me-2"></i> Riwayat</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="showMenu('analisis', this)" data-key="nav-analysis"><i class="bi bi-pie-chart me-2"></i> Analisis</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="showMenu('settings', this)" data-key="nav-settings"><i class="bi bi-gear me-2"></i> Pengaturan</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            
+            <!-- HOME SECTION -->
+            <section id="beranda" class="menu-section active">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-bold" data-key="dash-title">Beranda</h2>
+                    <button class="btn btn-outline-primary rounded-pill" onclick="triggerSnapshotFlow()">
+                        <i class="bi bi-camera me-2"></i> Snapshot
+                    </button>
+                </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="card bg-primary text-white p-3 text-center">
+                            <small data-key="card-balance">Saldo</small>
+                            <h3 id="disp-saldo">Rp 0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white p-3 text-center">
+                            <small data-key="card-income">Pemasukan</small>
+                            <h3 id="disp-masuk">Rp 0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-danger text-white p-3 text-center">
+                            <small data-key="card-expense">Pengeluaran</small>
+                            <h3 id="disp-keluar">Rp 0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card p-3 border-start border-primary border-4">
+                    <h6><i class="bi bi-robot me-2"></i> AI Advisor</h6>
+                    <p id="ai-advice" class="small mb-0">Memulai analisis data Anda...</p>
+                </div>
+            </section>
+
+            <!-- ADD TRANSACTION SECTION -->
+            <section id="tambah" class="menu-section" style="display:none;">
+                <h2 class="fw-bold mb-4" data-key="add-title">Tambah Catatan</h2>
+                <div class="card p-4 shadow-sm" style="max-width: 600px;">
+                    <form id="financeForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Tipe</label>
+                            <select id="type" class="form-select" onchange="updateCategories()">
+                                <option value="masuk">Pemasukan (+)</option>
+                                <option value="keluar">Pengeluaran (-)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Nominal</label>
+                            <input type="number" id="amount" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Kategori</label>
+                            <select id="category" class="form-select"></select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Keterangan</label>
+                            <input type="text" id="note" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Tanggal</label>
+                            <input type="date" id="date" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">Simpan</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- HISTORY SECTION -->
+            <section id="riwayat" class="menu-section" style="display:none;">
+                <h2 class="fw-bold mb-4" data-key="hist-title">Riwayat</h2>
+                <div class="card shadow-sm overflow-hidden">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr><th>Tanggal</th><th>Keterangan</th><th>Kategori</th><th>Nominal</th><th>Aksi</th></tr>
+                            </thead>
+                            <tbody id="historyTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ANALYSIS SECTION -->
+            <section id="analisis" class="menu-section" style="display:none;">
+                <h2 class="fw-bold mb-4" data-key="analysis-title">Analisis</h2>
+                <div class="row g-3">
+                    <div class="col-12"><div class="card p-3"><canvas id="mainChart" style="max-height: 300px;"></canvas></div></div>
+                    <div class="col-md-6"><div class="card p-3"><canvas id="categoryChartIn" style="max-height: 250px;"></canvas></div></div>
+                    <div class="col-md-6"><div class="card p-3"><canvas id="categoryChartOut" style="max-height: 250px;"></canvas></div></div>
+                </div>
+            </section>
+
+            <!-- SETTINGS SECTION -->
+            <section id="settings" class="menu-section" style="display:none;">
+                <h2 class="fw-bold mb-4" data-key="sett-title">Pengaturan</h2>
+                <div class="card p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">TEMA</label>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-outline-primary w-100" id="btn-light" onclick="setTheme('light')">Light</button>
+                                <button class="btn btn-sm btn-outline-dark w-100" id="btn-dark" onclick="setTheme('dark')">Dark</button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">BAHASA</label>
+                            <select class="form-select" id="setting-lang" onchange="changeLanguage(this.value)">
+                                <option value="id">Bahasa Indonesia</option>
+                                <option value="en">English</option>
+                            </select>
+                        </div>
+                    </div>
+                    <hr>
+                    <button class="btn btn-danger w-100 mt-3" onclick="logout()">Keluar Aplikasi</button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<!-- MODAL: SNAPSHOT PREVIEW -->
+<div class="modal fade" id="snapshotModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 20px;">
+            <div class="modal-body p-0">
+                <div id="capture-area" class="bg-snapshot-dark">
+                    <h4 class="fw-bold mb-1">GatiFin Report</h4>
+                    <p id="snap-date-label" class="small opacity-75"></p>
+                    <div class="row g-2 mt-3">
+                        <div class="col-6"><div class="glass-card-snapshot"><small>Masuk</small><h5 id="snap-in-val" class="mb-0"></h5></div></div>
+                        <div class="col-6"><div class="glass-card-snapshot"><small>Keluar</small><h5 id="snap-out-val" class="mb-0"></h5></div></div>
+                    </div>
+                </div>
+                <div class="p-3 text-center">
+                    <div class="btn-group w-100 mb-3">
+                        <button class="btn btn-sm btn-outline-dark" onclick="updateSnapTheme('dark')">Dark</button>
+                        <button class="btn btn-sm btn-outline-primary" onclick="updateSnapTheme('blue')">Blue</button>
+                    </div>
+                    <button class="btn btn-primary w-100 fw-bold" onclick="downloadSnapshot()">Simpan Gambar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    /* --- DATA & CONFIG --- */
+    let currentUser = "";
+    let transactions = [];
+    let charts = {};
+    const categories = { masuk: ["Gaji", "Investasi", "Lainnya"], keluar: ["Makan", "Transport", "Belanja", "Tagihan"] };
+    const i18n = {
+        id: { "nav-home": "Beranda", "dash-title": "Beranda", "card-balance": "Total Saldo" },
+        en: { "nav-home": "Home", "dash-title": "Dashboard", "card-balance": "Current Balance" }
+    };
+
+    /* --- AUTH SYSTEM --- */
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const user = document.getElementById('username').value;
+        // Simulasi: Username apapun bisa masuk untuk demo (GatiFin logic)
+        loginUser(user);
+    });
+
+    function loginUser(user) {
+        currentUser = user;
+        sessionStorage.setItem('fintrack_logged_user', user);
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+        initApp();
+    }
+
+    function logout() { sessionStorage.clear(); location.reload(); }
+
+    /* --- THEME & LANG --- */
+    function setTheme(theme) {
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('fintrack_theme', 'dark');
+        } else {
+            document.body.classList.remove('dark-mode');
+            localStorage.setItem('fintrack_theme', 'light');
+        }
+    }
+
+    function changeLanguage(lang) {
+        document.querySelectorAll('[data-key]').forEach(el => {
+            const key = el.getAttribute('data-key');
+            if (i18n[lang][key]) el.innerText = i18n[lang][key];
+        });
+    }
+
+    /* --- CORE LOGIC --- */
+    function initApp() {
+        const savedTheme = localStorage.getItem('fintrack_theme') || 'light';
+        setTheme(savedTheme);
+        transactions = JSON.parse(localStorage.getItem(`fintrack_db_${currentUser}`)) || [];
+        document.getElementById('date').valueAsDate = new Date();
+        updateCategories();
+        updateUI();
+    }
+
+    function updateCategories() {
+        const type = document.getElementById('type').value;
+        const select = document.getElementById('category');
+        select.innerHTML = categories[type].map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
+    document.getElementById('financeForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const data = {
+            id: Date.now(),
+            type: document.getElementById('type').value,
+            amount: parseInt(document.getElementById('amount').value),
+            category: document.getElementById('category').value,
+            note: document.getElementById('note').value,
+            date: document.getElementById('date').value
+        };
+        transactions.unshift(data);
+        localStorage.setItem(`fintrack_db_${currentUser}`, JSON.stringify(transactions));
+        this.reset();
+        initApp();
+        alert("Data tersimpan!");
+    });
+
+    function deleteTransaction(id) {
+        transactions = transactions.filter(t => t.id !== id);
+        localStorage.setItem(`fintrack_db_${currentUser}`, JSON.stringify(transactions));
+        updateUI();
+    }
+
+    function updateUI() {
+        let inSum = 0, outSum = 0;
+        const tbody = document.getElementById('historyTableBody');
+        tbody.innerHTML = '';
+
+        transactions.forEach(t => {
+            if (t.type === 'masuk') inSum += t.amount; else outSum += t.amount;
+            tbody.innerHTML += `
+                <tr>
+                    <td><small>${t.date}</small></td>
+                    <td>${t.note}</td>
+                    <td><span class="badge bg-light text-dark">${t.category}</span></td>
+                    <td class="${t.type === 'masuk' ? 'text-success' : 'text-danger'} fw-bold">Rp ${t.amount.toLocaleString()}</td>
+                    <td><i class="bi bi-trash text-danger" style="cursor:pointer" onclick="deleteTransaction(${t.id})"></i></td>
+                </tr>`;
+        });
+
+        document.getElementById('disp-masuk').innerText = `Rp ${inSum.toLocaleString()}`;
+        document.getElementById('disp-keluar').innerText = `Rp ${outSum.toLocaleString()}`;
+        document.getElementById('disp-saldo').innerText = `Rp ${(inSum - outSum).toLocaleString()}`;
+        updateAI(inSum, outSum);
+    }
+
+    function updateAI(inSum, outSum) {
+        const advice = document.getElementById('ai-advice');
+        if (outSum > inSum) advice.innerText = "Peringatan: Pengeluaran melebihi pemasukan. Kurangi belanja tersier!";
+        else advice.innerText = "Kondisi keuangan sehat. Pertahankan tabungan Anda!";
+    }
+
+    function showMenu(menuId, el) {
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        el.classList.add('active');
+        document.querySelectorAll('.menu-section').forEach(s => s.style.display = 'none');
+        document.getElementById(menuId).style.display = 'block';
+        if (menuId === 'analisis') renderCharts();
+    }
+
+    /* --- CHARTS --- */
+    function renderCharts() {
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        if (charts.main) charts.main.destroy();
+        charts.main = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Masuk', 'Keluar'],
+                datasets: [{ data: [
+                    transactions.filter(t=>t.type==='masuk').reduce((a,b)=>a+b.amount,0),
+                    transactions.filter(t=>t.type==='keluar').reduce((a,b)=>a+b.amount,0)
+                ], backgroundColor: ['#2ecc71', '#e74c3c']}]
+            }
+        });
+    }
+
+    /* --- SNAPSHOT --- */
+    function triggerSnapshotFlow() {
+        const inSum = transactions.filter(t=>t.type==='masuk').reduce((a,b)=>a+b.amount,0);
+        const outSum = transactions.filter(t=>t.type==='keluar').reduce((a,b)=>a+b.amount,0);
+        document.getElementById('snap-date-label').innerText = new Date().toLocaleDateString('id-ID', {dateStyle:'full'});
+        document.getElementById('snap-in-val').innerText = `Rp ${inSum.toLocaleString()}`;
+        document.getElementById('snap-out-val').innerText = `Rp ${outSum.toLocaleString()}`;
+        new bootstrap.Modal(document.getElementById('snapshotModal')).show();
+    }
+
+    function updateSnapTheme(theme) {
+        const area = document.getElementById('capture-area');
+        area.className = (theme === 'blue') ? 'bg-snapshot-blue' : 'bg-snapshot-dark';
+    }
+
+    function downloadSnapshot() {
+        html2canvas(document.getElementById('capture-area')).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'GatiFin_Report.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+    }
+</script>
+</body>
+</html>
