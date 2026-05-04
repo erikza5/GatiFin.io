@@ -3,45 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GatiFin - Solusi Keuangan Cerdas</title>
+    <title>GatiFin - Smart Financial Solution</title>
     
-    <!-- CSS Dependencies -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
-    <!-- JS Dependencies -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root { --primary: #4e73df; --bg-light: #f8f9fc; --sidebar-bg: #2e59d9; }
-        
-        /* --- DARK MODE SYSTEM[cite: 1] --- */
         body.dark-mode { --bg-light: #121212; background: var(--bg-light); color: #ffffff; }
-        body.dark-mode .sidebar { background: #000000; }
-        body.dark-mode .card, body.dark-mode .modal-content { background: #1e1e1e; color: #ffffff; border: 1px solid #333333; }
-        body.dark-mode .form-control, body.dark-mode .form-select { background: #2d2d2d; border-color: #444444; color: #ffffff !important; }
-        body.dark-mode .table { color: #ffffff; border-color: #333333; }
-        body.dark-mode .text-muted { color: #bbbbbb !important; }
-
-        /* --- LAYOUT STYLES[cite: 1] --- */
-        body { background: var(--bg-light); font-family: 'Segoe UI', sans-serif; overflow-x: hidden; transition: background 0.3s; }
-        #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--sidebar-bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .sidebar { min-height: 100vh; background: var(--sidebar-bg); color: white; z-index: 1000; position: fixed; width: inherit; }
-        .nav-link { color: rgba(255,255,255,0.7); cursor: pointer; border-radius: 10px; margin-bottom: 5px; transition: 0.2s; }
-        .nav-link.active { background: rgba(255,255,255,0.2); color: white; font-weight: bold; }
-        .nav-link:hover { background: rgba(255,255,255,0.1); color: white; transform: translateX(5px); }
-        .menu-section { display: none; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; }
-        .menu-section.active { display: block; opacity: 1; transform: translateY(0); }
+        body { background: var(--bg-light); font-family: 'Segoe UI', sans-serif; transition: 0.3s; }
         
-        /* --- PROFILE & SNAPSHOT[cite: 1] --- */
-        .sidebar-profile { width: 60px; height: 60px; object-fit: cover; border: 2px solid rgba(255,255,255,0.3); }
-        #profile-img-display { width: 150px; height: 150px; object-fit: cover; border: 5px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        #capture-area { position: relative; padding: 40px; color: #fff !important; text-align: center; border-radius: 25px; overflow: hidden; }
-        .bg-snapshot-dark { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
-        .bg-snapshot-blue { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); }
-        .glass-card-snapshot { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 15px; border: 1px solid rgba(255,255,255,0.2); }
-
+        #auth-screen { position: fixed; inset: 0; background: var(--sidebar-bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .sidebar { min-height: 100vh; background: var(--sidebar-bg); color: white; position: fixed; width: inherit; transition: 0.3s; }
+        .nav-link { color: rgba(255,255,255,0.7); cursor: pointer; border-radius: 10px; margin: 5px 10px; }
+        .nav-link.active { background: rgba(255,255,255,0.2); color: white; font-weight: bold; }
+        .menu-section { display: none; }
+        .menu-section.active { display: block; }
+        
+        .logo-login { width: 120px; margin-bottom: 20px; }
+        .logo-sidebar { width: 40px; margin-right: 10px; }
+        
         @media (max-width: 768px) {
             .sidebar { position: relative; min-height: auto; width: 100%; }
             main { margin-left: 0 !important; }
@@ -52,19 +34,14 @@
 
 <!-- SECTION: AUTH[cite: 1] -->
 <div id="auth-screen">
-    <div class="card p-4 shadow-lg animate__animated animate__zoomIn" style="width: 350px;">
-        <div class="text-center mb-4">
-            <h5 class="fw-bold text-primary">GatiFin Login</h5>
-        </div>
+    <div class="card p-4 shadow-lg text-center" style="width: 350px;">
+        <img src="logo.png" alt="GatiFin Logo" class="logo-login mx-auto">
+        <h5 class="fw-bold text-primary mb-4">GatiFin Login</h5>
         <form id="loginForm">
-            <div class="mb-3"><input type="text" id="username" class="form-control" placeholder="Username" required></div>
-            <div class="mb-3"><input type="password" id="password" class="form-control" placeholder="Password" required></div>
-            <button type="submit" class="btn btn-primary w-100 fw-bold mb-3">Masuk</button>
+            <input type="text" id="username" class="form-control mb-3" placeholder="Username" required>
+            <input type="password" id="password" class="form-control mb-3" placeholder="Password" required>
+            <button type="submit" class="btn btn-primary w-100 fw-bold">Login</button>
         </form>
-        <div class="text-center">
-            <div onclick="authenticateBiometric()" style="cursor:pointer"><i class="bi bi-fingerprint fs-1 text-primary"></i></div>
-            <p class="small text-muted mt-2">Gunakan Biometrik</p>
-        </div>
     </div>
 </div>
 
@@ -72,120 +49,41 @@
     <div class="row">
         <!-- SIDEBAR[cite: 1] -->
         <nav class="col-md-3 col-lg-2 d-md-block sidebar py-4">
-            <div class="text-center mb-4">
-                <img src="https://via.placeholder.com/150" id="sidebar-img-display" class="sidebar-profile rounded-circle mb-2">
-                <div class="fw-bold text-white" id="sidebar-name-display">User</div>
-                <div class="small opacity-50 text-white" id="sidebar-username-display">@username</div>
+            <div class="px-3 mb-4 d-flex align-items-center">
+                <img src="1.png" alt="Icon" class="logo-sidebar">
+                <span class="fs-4 fw-bold">GatiFin</span>
             </div>
-            <ul class="nav flex-column px-2">
-                <li class="nav-item"><a class="nav-link active" onclick="showMenu('beranda', this)" data-key="nav-home"><i class="bi bi-house-door me-2"></i> Beranda</a></li>
-                <li class="nav-item"><a class="nav-link" onclick="showMenu('tambah', this)" data-key="nav-add"><i class="bi bi-plus-square me-2"></i> Catatan</a></li>
-                <li class="nav-item"><a class="nav-link" onclick="showMenu('riwayat', this)" data-key="nav-history"><i class="bi bi-clock-history me-2"></i> Riwayat</a></li>
-                <li class="nav-item"><a class="nav-link" onclick="showMenu('analisis', this)" data-key="nav-analysis"><i class="bi bi-pie-chart me-2"></i> Analisis</a></li>
-                <li class="nav-item"><a class="nav-link" onclick="showMenu('profil', this)" data-key="nav-profile"><i class="bi bi-person me-2"></i> Profil</a></li>
-                <li class="nav-item mt-3"><a class="nav-link" onclick="showMenu('settings', this)" data-key="nav-settings"><i class="bi bi-gear me-2"></i> Pengaturan</a></li>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link active" onclick="showMenu('beranda', this)" id="nav-home"><i class="bi bi-house me-2"></i> Beranda</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="showMenu('tambah', this)" id="nav-add"><i class="bi bi-plus-circle me-2"></i> Tambah</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="showMenu('analisis', this)" id="nav-analysis"><i class="bi bi-graph-up me-2"></i> Analisis</a></li>
+                <li class="nav-item"><a class="nav-link" onclick="showMenu('settings', this)" id="nav-settings"><i class="bi bi-gear me-2"></i> Pengaturan</a></li>
             </ul>
         </nav>
 
-        <!-- MAIN CONTENT[cite: 1] -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
-            
             <!-- BERANDA[cite: 1] -->
             <section id="beranda" class="menu-section active">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="fw-bold" data-key="dash-title">Beranda</h2>
-                    <button class="btn btn-primary rounded-pill px-4" onclick="triggerSnapshotFlow()">
-                        <i class="bi bi-camera-fill me-2"></i> GatiFin Snapshot
-                    </button>
-                </div>
-                <div class="row g-4 mb-4">
-                    <div class="col-md-4"><div class="card bg-primary text-white p-4 text-center">
-                        <small data-key="card-balance">Saldo</small><h2 id="disp-saldo" class="fw-bold">Rp 0</h2>
-                    </div></div>
-                    <div class="col-md-4"><div class="card bg-success text-white p-4 text-center">
-                        <small data-key="card-income">Pemasukan</small><h2 id="disp-masuk" class="fw-bold">Rp 0</h2>
-                    </div></div>
-                    <div class="col-md-4"><div class="card bg-danger text-white p-4 text-center">
-                        <small data-key="card-expense">Pengeluaran</small><h2 id="disp-keluar" class="fw-bold">Rp 0</h2>
-                    </div></div>
-                </div>
-                <div class="card p-3 border-start border-primary border-4 shadow-sm">
-                    <h6 class="fw-bold text-primary"><i class="bi bi-robot me-2"></i> GatiFin AI Advisor</h6>
-                    <p id="ai-advice" class="mb-0 small text-muted" data-key="ai-empty">Belum ada data transaksi.</p>
+                <h2 id="txt-welcome" class="fw-bold mb-4">Selamat Datang</h2>
+                <div class="row g-3">
+                    <div class="col-md-6"><div class="card p-4 bg-primary text-white"><h6>Total Saldo</h6><h3 id="disp-saldo">Rp 0</h3></div></div>
                 </div>
             </section>
 
-            <!-- TAMBAH[cite: 1] -->
-            <section id="tambah" class="menu-section">
-                <h2 class="fw-bold mb-4" data-key="add-title">Tambah Catatan</h2>
-                <div class="card p-4 col-lg-7">
-                    <form id="financeForm">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label small fw-bold">Tipe</label>
-                                <select id="type" class="form-select" onchange="updateCategories()">
-                                    <option value="masuk">Pemasukan (+)</option>
-                                    <option value="keluar">Pengeluaran (-)</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label small fw-bold">Nominal</label>
-                                <input type="number" id="amount" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="mb-3"><label class="form-label small fw-bold">Kategori</label><select id="category" class="form-select"></select></div>
-                        <div class="mb-3"><label class="form-label small fw-bold">Keterangan</label><input type="text" id="note" class="form-control" required></div>
-                        <div class="mb-3"><label class="form-label small fw-bold">Tanggal</label><input type="date" id="date" class="form-control" required></div>
-                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2">Simpan Transaksi</button>
-                    </form>
-                </div>
-            </section>
-
-            <!-- RIWAYAT[cite: 1] -->
-            <section id="riwayat" class="menu-section">
-                <h2 class="fw-bold mb-4" data-key="hist-title">Riwayat Transaksi</h2>
-                <div class="card shadow-sm table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr><th>Tanggal</th><th>Keterangan</th><th>Kategori</th><th>Nominal</th><th>Aksi</th></tr>
-                        </thead>
-                        <tbody id="historyTableBody"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- ANALISIS[cite: 1] -->
+            <!-- ANALISIS KATEGORI[cite: 1] -->
             <section id="analisis" class="menu-section">
-                <h2 class="fw-bold mb-4">Analisis Keuangan</h2>
-                <div class="row g-4">
-                    <div class="col-12"><div class="card p-4 text-center"><h6>Arus Kas</h6><div style="height:300px"><canvas id="mainChart"></canvas></div></div></div>
-                    <div class="col-md-6"><div class="card p-4"><h6>Pengeluaran</h6><div style="height:250px"><canvas id="categoryChartOut"></canvas></div></div></div>
-                    <div class="col-md-6"><div class="card p-4"><h6>Pemasukan</h6><div style="height:250px"><canvas id="categoryChartIn"></canvas></div></div></div>
-                </div>
-            </section>
-
-            <!-- PROFIL[cite: 1] -->
-            <section id="profil" class="menu-section">
-                <h2 class="fw-bold mb-4">Profil Saya</h2>
-                <div class="card p-4 shadow-sm border-0">
-                    <div class="row align-items-center">
-                        <div class="col-md-4 text-center mb-4">
-                            <div class="position-relative d-inline-block">
-                                <img src="https://via.placeholder.com/150" id="profile-img-display" class="rounded-circle shadow">
-                                <label for="upload-photo" class="btn btn-primary btn-sm position-absolute bottom-0 end-0 rounded-circle"><i class="bi bi-camera-fill"></i></label>
-                                <input type="file" id="upload-photo" hidden accept="image/*" onchange="previewImage(event)">
-                            </div>
+                <h2 class="fw-bold mb-4">Analisis Kategori</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card p-3 shadow-sm mb-4">
+                            <h6 class="text-center">Pengeluaran per Kategori</h6>
+                            <canvas id="categoryChartOut"></canvas>
                         </div>
-                        <div class="col-md-8">
-                            <form id="profileForm">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3"><label class="form-label small fw-bold">Username</label><input type="text" id="p-username" class="form-control" readonly></div>
-                                    <div class="col-md-6 mb-3"><label class="form-label small fw-bold">Nama Lengkap</label><input type="text" id="p-name" class="form-control"></div>
-                                    <div class="col-md-6 mb-3"><label class="form-label small fw-bold">Pekerjaan</label><input type="text" id="p-job" class="form-control"></div>
-                                    <div class="col-md-6 mb-3"><label class="form-label small fw-bold">Usia</label><input type="number" id="p-age" class="form-control"></div>
-                                </div>
-                                <button type="button" class="btn btn-primary px-5 rounded-pill fw-bold" onclick="saveProfileData()">Simpan Perubahan</button>
-                            </form>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card p-3 shadow-sm mb-4">
+                            <h6 class="text-center">Pemasukan per Kategori</h6>
+                            <canvas id="categoryChartIn"></canvas>
                         </div>
                     </div>
                 </div>
@@ -194,248 +92,85 @@
             <!-- PENGATURAN[cite: 1] -->
             <section id="settings" class="menu-section">
                 <h2 class="fw-bold mb-4">Pengaturan</h2>
-                <div class="card p-4 mb-4 col-lg-7">
-                    <div class="row">
-                        <div class="col-md-6 mb-4"><label class="form-label fw-bold small">Tampilan</label><div class="d-flex gap-2">
-                            <button class="btn btn-sm btn-outline-primary" onclick="setTheme('light')">Light</button>
-                            <button class="btn btn-sm btn-outline-dark" onclick="setTheme('dark')">Dark</button>
-                        </div></div>
-                        <div class="col-md-6 mb-4"><label class="form-label fw-bold small">Bahasa</label><select class="form-select" id="setting-lang" onchange="changeLanguage(this.value)">
-                            <option value="id">Bahasa Indonesia</option><option value="en">English</option>
-                        </select></div>
-                        <div class="col-12"><button class="btn btn-outline-primary w-100 fw-bold" data-bs-toggle="modal" data-bs-target="#modalPassword"><i class="bi bi-key me-2"></i> Ubah Kata Sandi</button></div>
-                    </div>
+                <div class="card p-4 col-lg-6">
+                    <label class="form-label fw-bold">Pilih Bahasa / Language</label>
+                    <select class="form-select mb-4" onchange="changeLanguage(this.value)">
+                        <option value="id">Bahasa Indonesia</option>
+                        <option value="en">English</option>
+                    </select>
+                    <button class="btn btn-danger" onclick="logout()">Logout</button>
                 </div>
-                <div class="card p-4 col-lg-7 border-danger"><button class="btn btn-danger w-100 fw-bold" onclick="logout()">Keluar Aplikasi</button></div>
             </section>
         </main>
     </div>
 </div>
 
-<!-- MODAL: SNAPSHOT DATE PICKER[cite: 1] -->
-<div class="modal fade" id="datePickerModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-            <div class="modal-body p-4 text-center">
-                <h6 class="fw-bold mb-3">Rentang Snapshot</h6>
-                <select id="snap-type" class="form-select rounded-pill mb-3" onchange="toggleDateInput()">
-                    <option value="daily">Harian</option><option value="monthly">Bulanan</option><option value="yearly">Tahunan</option>
-                </select>
-                <input type="date" id="input-snap-date" class="form-control rounded-pill mb-3">
-                <button class="btn btn-primary w-100 rounded-pill fw-bold" onclick="confirmSnapshotDate()">Buat Snapshot</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL: SNAPSHOT PREVIEW[cite: 1] -->
-<div class="modal fade" id="snapshotModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 25px;">
-            <div class="modal-body p-0">
-                <div id="capture-area" class="bg-snapshot-dark">
-                    <h2 class="fw-bold">GatiFin</h2>
-                    <h5 id="snap-date-label" class="mb-4">Memuat...</h5>
-                    <div class="row g-3">
-                        <div class="col-6"><div class="glass-card-snapshot"><small>Pemasukan</small><h4 id="snap-in-val" class="mb-0"></h4></div></div>
-                        <div class="col-6"><div class="glass-card-snapshot"><small>Pengeluaran</small><h4 id="snap-out-val" class="mb-0"></h4></div></div>
-                    </div>
-                    <p class="mt-4 small italic">"Cerdas Mengelola bersama GatiFin AI"</p>
-                </div>
-                <div class="p-4 text-center">
-                    <div class="btn-group w-100 mb-3"><button class="btn btn-outline-dark" onclick="updateSnapTheme('dark')">Gelap</button><button class="btn btn-outline-primary" onclick="updateSnapTheme('blue')">Biru</button></div>
-                    <button class="btn btn-dark w-100 rounded-pill fw-bold" onclick="downloadSnapshot()"><i class="bi bi-download me-2"></i>Simpan</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL: PASSWORD[cite: 1] -->
-<div class="modal fade" id="modalPassword" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header"><h5 class="fw-bold">Ubah Kata Sandi</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
-                <div class="mb-3"><label class="form-label small fw-bold">Sandi Lama</label><input type="password" id="old-pass" class="form-control"></div>
-                <div class="mb-3"><label class="form-label small fw-bold">Sandi Baru</label><input type="password" id="new-pass" class="form-control"></div>
-            </div>
-            <div class="modal-footer"><button class="btn btn-primary w-100" onclick="changeUserPassword()">Simpan</button></div>
-        </div>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-    /* --- SYSTEM CORE[cite: 1] --- */
-    let currentUser = ""; let transactions = [];
-    let mainChart, catChartIn, catChartOut;
-    let currentCurrency = "Rp";
-    const categoryData = { masuk: ["Gaji", "Bonus", "Investasi", "Lainnya"], keluar: ["Makanan", "Transport", "Belanja", "Tagihan", "Lainnya"] };
+    /* --- DATA & MULTILANGUAGE[cite: 1] --- */
+    let transactions = [];
+    const langData = {
+        id: { home: "Beranda", add: "Tambah", analysis: "Analisis", settings: "Pengaturan", welcome: "Selamat Datang" },
+        en: { home: "Dashboard", add: "Add Note", analysis: "Analysis", settings: "Settings", welcome: "Welcome Back" }
+    };
 
-    /* --- AUTH & PROFILE[cite: 1] --- */
-    document.getElementById('loginForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const u = document.getElementById('username').value;
-        const p = document.getElementById('password').value;
-        // Simulasi pendaftaran otomatis jika belum ada user
-        let users = JSON.parse(localStorage.getItem('fintrack_users')) || {};
-        if (!users[u]) users[u] = { password: p };
-        
-        if (users[u].password === p) {
-            localStorage.setItem('fintrack_users', JSON.stringify(users));
-            loginUser(u);
-        } else alert("Login Gagal!");
-    });
-
-    function loginUser(u) {
-        currentUser = u;
-        sessionStorage.setItem('fintrack_logged_user', u);
-        document.getElementById('auth-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'block';
-        loadUserData();
+    function changeLanguage(lang) {
+        document.getElementById('nav-home').innerHTML = `<i class="bi bi-house me-2"></i> ${langData[lang].home}`;
+        document.getElementById('nav-add').innerHTML = `<i class="bi bi-plus-circle me-2"></i> ${langData[lang].add}`;
+        document.getElementById('nav-analysis').innerHTML = `<i class="bi bi-graph-up me-2"></i> ${langData[lang].analysis}`;
+        document.getElementById('nav-settings').innerHTML = `<i class="bi bi-gear me-2"></i> ${langData[lang].settings}`;
+        document.getElementById('txt-welcome').innerText = langData[lang].welcome;
+        localStorage.setItem('gatifin_lang', lang);
     }
 
-    function loadUserData() {
-        transactions = JSON.parse(localStorage.getItem(`fintrack_db_${currentUser}`)) || [];
-        document.getElementById('p-username').value = currentUser;
-        document.getElementById('sidebar-username-display').innerText = "@" + currentUser;
-        
-        const savedProf = JSON.parse(localStorage.getItem(`fintrack_prof_${currentUser}`));
-        if(savedProf) {
-            document.getElementById('p-name').value = savedProf.name || "";
-            document.getElementById('sidebar-name-display').innerText = savedProf.name || currentUser;
-            document.getElementById('p-job').value = savedProf.job || "";
-            document.getElementById('p-age').value = savedProf.age || "";
-        }
-        
-        const savedImg = localStorage.getItem(`fintrack_img_${currentUser}`);
-        if(savedImg) {
-            document.getElementById('profile-img-display').src = savedImg;
-            document.getElementById('sidebar-img-display').src = savedImg;
-        }
-        updateCategories(); updateUI();
-    }
-
-    function saveProfileData() {
-        const prof = { name: document.getElementById('p-name').value, job: document.getElementById('p-job').value, age: document.getElementById('p-age').value };
-        localStorage.setItem(`fintrack_prof_${currentUser}`, JSON.stringify(prof));
-        document.getElementById('sidebar-name-display').innerText = prof.name || currentUser;
-        alert("Profil disimpan!");
-    }
-
-    function previewImage(e) {
-        const reader = new FileReader();
-        reader.onload = () => {
-            const img = reader.result;
-            document.getElementById('profile-img-display').src = img;
-            document.getElementById('sidebar-img-display').src = img;
-            localStorage.setItem(`fintrack_img_${currentUser}`, img);
+    /* --- CHART SYSTEM[cite: 1] --- */
+    let chartIn, chartOut;
+    function updateCharts() {
+        const categories = {
+            masuk: {}, keluar: {}
         };
-        reader.readAsDataURL(e.target.files[0]);
-    }
-
-    /* --- FINANCE LOGIC[cite: 1] --- */
-    function updateCategories() {
-        const type = document.getElementById('type').value;
-        const select = document.getElementById('category');
-        select.innerHTML = categoryData[type].map(c => `<option value="${c}">${c}</option>`).join('');
-    }
-
-    document.getElementById('financeForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const data = { id: Date.now(), type: document.getElementById('type').value, amount: parseInt(document.getElementById('amount').value), category: document.getElementById('category').value, note: document.getElementById('note').value, date: document.getElementById('date').value };
-        transactions.unshift(data);
-        localStorage.setItem(`fintrack_db_${currentUser}`, JSON.stringify(transactions));
-        this.reset(); updateUI();
-    });
-
-    function updateUI() {
-        const body = document.getElementById('historyTableBody');
-        body.innerHTML = ''; let inSum = 0, outSum = 0;
+        
         transactions.forEach(t => {
-            if(t.type === 'masuk') inSum += t.amount; else outSum += t.amount;
-            body.innerHTML += `<tr><td>${t.date}</td><td>${t.note}</td><td><span class="badge bg-light text-dark">${t.category}</span></td><td class="${t.type === 'masuk' ? 'text-success':'text-danger'} fw-bold">Rp ${t.amount.toLocaleString()}</td><td><i class="bi bi-trash text-danger" style="cursor:pointer" onclick="deleteTransaction(${t.id})"></i></td></tr>`;
+            categories[t.type][t.category] = (categories[t.type][t.category] || 0) + t.amount;
         });
-        document.getElementById('disp-masuk').innerText = `Rp ${inSum.toLocaleString()}`;
-        document.getElementById('disp-keluar').innerText = `Rp ${outSum.toLocaleString()}`;
-        document.getElementById('disp-saldo').innerText = `Rp ${(inSum - outSum).toLocaleString()}`;
-    }
 
-    function deleteTransaction(id) {
-        transactions = transactions.filter(t => t.id !== id);
-        localStorage.setItem(`fintrack_db_${currentUser}`, JSON.stringify(transactions));
-        updateUI();
-    }
+        if(chartIn) chartIn.destroy();
+        chartIn = new Chart(document.getElementById('categoryChartIn'), {
+            type: 'pie',
+            data: {
+                labels: Object.keys(categories.masuk),
+                datasets: [{ data: Object.values(categories.masuk), backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e'] }]
+            }
+        });
 
-    /* --- SNAPSHOT SYSTEM[cite: 1] --- */
-    function triggerSnapshotFlow() {
-        new bootstrap.Modal(document.getElementById('datePickerModal')).show();
-        document.getElementById('input-snap-date').valueAsDate = new Date();
-    }
-
-    function toggleDateInput() {
-        const t = document.getElementById('snap-type').value;
-        const i = document.getElementById('input-snap-date');
-        if(t === 'monthly') i.type = 'month';
-        else if(t === 'yearly') { i.type = 'number'; i.value = 2026; }
-        else i.type = 'date';
-    }
-
-    function confirmSnapshotDate() {
-        const type = document.getElementById('snap-type').value;
-        const val = document.getElementById('input-snap-date').value;
-        let filtered = transactions.filter(t => t.date.includes(val));
-        if(!filtered.length) return alert("Data tidak ditemukan!");
-        
-        const iS = filtered.filter(t=>t.type==='masuk').reduce((a,b)=>a+b.amount,0);
-        const oS = filtered.filter(t=>t.type==='keluar').reduce((a,b)=>a+b.amount,0);
-        
-        document.getElementById('snap-date-label').innerText = val;
-        document.getElementById('snap-in-val').innerText = `Rp ${iS.toLocaleString()}`;
-        document.getElementById('snap-out-val').innerText = `Rp ${oS.toLocaleString()}`;
-        bootstrap.Modal.getInstance(document.getElementById('datePickerModal')).hide();
-        new bootstrap.Modal(document.getElementById('snapshotModal')).show();
-    }
-
-    function updateSnapTheme(t) { document.getElementById('capture-area').className = t === 'blue' ? 'bg-snapshot-blue':'bg-snapshot-dark'; }
-
-    function downloadSnapshot() {
-        html2canvas(document.getElementById('capture-area')).then(canvas => {
-            const link = document.createElement('a');
-            link.download = `GatiFin_Snap_${Date.now()}.png`;
-            link.href = canvas.toDataURL(); link.click();
+        if(chartOut) chartOut.destroy();
+        chartOut = new Chart(document.getElementById('categoryChartOut'), {
+            type: 'pie',
+            data: {
+                labels: Object.keys(categories.keluar),
+                datasets: [{ data: Object.values(categories.keluar), backgroundColor: ['#e74c3c', '#f39c12', '#9b59b6', '#34495e'] }]
+            }
         });
     }
 
-    /* --- THEME & MENU[cite: 1] --- */
-    function setTheme(t) { document.body.className = t === 'dark' ? 'dark-mode' : ''; localStorage.setItem('fintrack_theme', t); }
-    
+    /* --- APP FLOW[cite: 1] --- */
     function showMenu(m, el) {
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         el.classList.add('active');
         document.querySelectorAll('.menu-section').forEach(s => s.classList.remove('active'));
         document.getElementById(m).classList.add('active');
-        if(m === 'analisis') refreshCharts();
+        if(m === 'analisis') updateCharts();
     }
 
-    function refreshCharts() {
-        const ctx = document.getElementById('mainChart').getContext('2d');
-        if(mainChart) mainChart.destroy();
-        mainChart = new Chart(ctx, {
-            type: 'bar',
-            data: { labels: ['Masuk', 'Keluar'], datasets: [{ data: [transactions.filter(t=>t.type==='masuk').reduce((a,b)=>a+b.amount,0), transactions.filter(t=>t.type==='keluar').reduce((a,b)=>a+b.amount,0)], backgroundColor: ['#2ecc71', '#e74c3c'] }] }
-        });
-    }
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+        // Inisialisasi bahasa dari storage
+        const savedLang = localStorage.getItem('gatifin_lang') || 'id';
+        changeLanguage(savedLang);
+    });
 
-    function logout() { sessionStorage.clear(); location.reload(); }
-
-    window.onload = () => {
-        const user = sessionStorage.getItem('fintrack_logged_user');
-        if(user) loginUser(user);
-    };
+    function logout() { location.reload(); }
 </script>
 </body>
 </html>
