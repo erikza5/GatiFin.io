@@ -85,14 +85,23 @@
 <!-- SECTION: AUTHENTICATION -->
 <div id="auth-screen">
     <!-- KOTAK LOGIN -->
-    <div id="login-box" class="card p-4 shadow-lg animate__animated animate__zoomIn" style="width: 350px;">
-        <!-- ... (isi form login) ... -->
+    <div id="login-box" class="card p-4 shadow-lg animate__animated animate__zoomIn" style="width: 350px; display: block;">
+        <div class="text-center mb-4">
+            <img src="1.png" class="app-logo mb-2" alt="Logo">
+            <h5 class="fw-bold text-primary">Selamat Datang</h5>
+        </div>
+        <form id="loginForm">
+            <div class="mb-3"><input type="text" id="username" class="form-control" placeholder="Username" required></div>
+            <div class="mb-3"><input type="password" id="password" class="form-control" placeholder="Password" required></div>
+            <button type="submit" class="btn btn-primary w-100 fw-bold">Masuk</button>
+        </form>
         <div class="text-center mt-3">
-            <p class="small">Belum punya akun? <a href="#" onclick="toggleAuth()">Daftar Disini</a></p>
+            <!-- PASTIKAN ONCLICK MENGARAH KE toggleAuth() -->
+            <p class="small">Belum punya akun? <a href="#" onclick="toggleAuth(); return false;">Daftar Disini</a></p>
         </div>
     </div>
 
-    <!-- KOTAK DAFTAR (Pop-up Mengambang) -->
+    <!-- KOTAK DAFTAR (Pop-up) -->
     <div id="register-box" class="card p-4 shadow-lg animate__animated animate__zoomIn" style="width: 350px; display: none;">
         <div class="text-center mb-4">
             <h5 class="fw-bold text-success">Buat Akun Baru</h5>
@@ -104,7 +113,7 @@
             <button type="submit" class="btn btn-success w-100 fw-bold">Simpan ke Database</button>
         </form>
         <div class="text-center mt-3">
-            <a href="#" onclick="toggleAuth()" class="small text-decoration-none">Kembali ke Login</a>
+            <a href="#" onclick="toggleAuth(); return false;" class="small text-decoration-none">Kembali ke Login</a>
         </div>
     </div>
 </div>
