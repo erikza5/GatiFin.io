@@ -8,10 +8,11 @@ app.use(express.json());
 
 // Konfigurasi Koneksi MariaDB/MySQL
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',      // Sesuaikan dengan user MySQL Anda
-    password: '',      // Sesuaikan dengan password MySQL Anda
-    database: 'gatifin_db'
+    host: process.env.MYSQLHOST,
+    user: process.env.MYSQLUSER,
+    password: process.env.MYSQLPASSWORD,
+    database: process.env.MYSQLDATABASE,
+    port: process.env.MYSQLPORT
 });
 
 db.connect(err => {
@@ -19,24 +20,19 @@ db.connect(err => {
     console.log('Terhubung ke Database MariaDB!');
 });
 
-// Endpoint untuk Login
+// Simpan transaksi baru (Versi Gabungan)
 app.post('/transactions', (req, res) => {
-    const { type, amount, description, transaction_date } = req.body;
+    const { username, type, amount, category, description, transaction_date } = req.body;
     
-    // Mapping value 'masuk' -> 'Pemasukan' dan 'keluar' -> 'Pengeluaran'
-    // agar sesuai dengan ENUM di database Anda
-    const dbType = type === 'masuk' ? 'Pemasukan' : 'Pengeluaran';
-
-    const sql = `INSERT INTO transactions 
-                 (type, amount, description, transaction_date) 
-                 VALUES (?, ?, ?, ?)`;
-                 
-    db.query(sql, [dbType, amount, description, transaction_date], (err, result) => {
+    // Pastikan kolom ini sesuai dengan nama kolom di tabel MySQL Railway Anda
+    const sql = "INSERT INTO transactions (username, type, amount, category, description, transaction_date) VALUES (?, ?, ?, ?, ?, ?)";
+    
+    db.query(sql, [username, type, amount, category, description, transaction_date], (err, result) => {
         if (err) {
-            console.error(err);
-            return res.status(500).send(err);
+            console.error("Error saat simpan transaksi:", err);
+            return res.status(500).json({ success: false, error: err.message });
         }
-        res.json({ success: true, id: result.insertId });
+        res.json({ success: true, message: "Data berhasil disimpan", id: result.insertId });
     });
 });
 
@@ -68,16 +64,6 @@ app.get('/transactions/:username', (req, res) => {
     });
 });
 
-// Simpan transaksi baru
-app.post('/transactions', (req, res) => {
-    const { username, type, amount, category, note, date } = req.body;
-    const sql = "INSERT INTO transactions (username, type, amount, category, note, date) VALUES (?, ?, ?, ?, ?, ?)";
-    db.query(sql, [username, type, amount, category, note, date], (err, result) => {
-        if (err) return res.status(500).send(err);
-        res.json({ message: "Data berhasil disimpan", id: result.insertId });
-    });
-});
-
 // Hapus transaksi
 app.delete('/transactions/:id', (req, res) => {
     db.query("DELETE FROM transactions WHERE id = ?", [req.params.id], (err, result) => {
@@ -86,4 +72,7 @@ app.delete('/transactions/:id', (req, res) => {
     });
 });
 
-app.listen(3000, () => console.log('Server berjalan di port 3000'));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server berjalan di port ${PORT}`);
+});
