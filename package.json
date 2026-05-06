@@ -5,3 +5,7 @@
     "mysql2": "^3.22.3"
   }
 }
+
+"scripts": {
+  "start": "node server.js"
+}
