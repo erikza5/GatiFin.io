@@ -36,6 +36,28 @@ app.post('/transactions', (req, res) => {
     });
 });
 
+// Endpoint untuk Login
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+
+    // Mencari user di tabel 'users'
+    const query = "SELECT * FROM users WHERE username = ? AND password = ?";
+    db.query(query, [username, password], (err, results) => {
+        if (err) {
+            console.error("Error saat login:", err);
+            return res.status(500).json({ success: false, message: "Terjadi kesalahan pada server." });
+        }
+
+        if (results.length > 0) {
+            // Jika ketemu
+            res.json({ success: true, username: results[0].username });
+        } else {
+            // Jika tidak ketemu
+            res.json({ success: false, message: "Username atau password salah!" });
+        }
+    });
+});
+
 // Endpoint untuk Registrasi)
 app.post('/register', async (req, res) => {
     const { username, email, password, full_name } = req.body;
