@@ -449,51 +449,101 @@
         initSettings();
     });
 
-    /* AUTHENTICATION */
-    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+     /* =============================================
+       AUTHENTICATION & APP LOGIC
+    ============================================= */
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const u = document.getElementById('username').value.trim();
         const p = document.getElementById('password').value;
-
-        try {
-            const response = await fetch('http://localhost:3000/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: u, password: p })
-            });
-            const result = await response.json();
-            if (result.success) {
-                loginUser(result.username);
-            } else {
-                alert(result.message);
-            }
-        } catch (err) {
-            // Fallback for local testing without server
-            const users = JSON.parse(localStorage.getItem('fintrack_users')) || {};
-            if (users[u] && users[u].password === p) {
-                loginUser(u);
-            } else {
-                alert("Gagal login. Pastikan server aktif atau akun terdaftar.");
-            }
+        if (!u || !p) return alert("Isi username dan password!");
+        const users = JSON.parse(localStorage.getItem('fintrack_users')) || {};
+        if (users[u] && users[u].password === p) {
+            loginUser(u);
+        } else if (users[u]) {
+            alert("Password salah!");
+        } else {
+            alert("Username tidak ditemukan! Silakan daftar terlebih dahulu.");
         }
     });
+
+    function registerSimulated() {
+        const u = prompt("Buat Username:");
+        if (!u || !u.trim()) return;
+        const username = u.trim();
+        const users = JSON.parse(localStorage.getItem('fintrack_users')) || {};
+        if (users[username]) {
+            return alert("Username sudah digunakan! Pilih username lain.");
+        }
+        const p = prompt("Buat Password:");
+        if (!p || p.length < 3) return alert("Password minimal 3 karakter!");
+        users[username] = { password: p };
+        localStorage.setItem('fintrack_users', JSON.stringify(users));
+        alert("Registrasi berhasil! Silakan login.");
+    }
+
+    function authenticateBiometric() {
+        // Simulated biometric: check if there's a logged-in user in sessionStorage
+        const lastUser = sessionStorage.getItem('fintrack_last_user');
+        if (lastUser) {
+            const users = JSON.parse(localStorage.getItem('fintrack_users')) || {};
+            if (users[lastUser]) {
+                loginUser(lastUser);
+                return;
+            }
+        }
+        // If no previous session, check if any user exists
+        const users = JSON.parse(localStorage.getItem('fintrack_users')) || {};
+        const userList = Object.keys(users);
+        if (userList.length === 1) {
+            // Auto-login with the only user (simulated biometric)
+            if (confirm(`Login sebagai "${userList[0]}"? (Simulasi Biometrik)`)) {
+                loginUser(userList[0]);
+            }
+        } else if (userList.length > 1) {
+            const chosen = prompt("Pilih username:\n" + userList.join(', '));
+            if (chosen && users[chosen]) {
+                loginUser(chosen);
+            } else if (chosen) {
+                alert("Username tidak ditemukan!");
+            }
+        } else {
+            alert("Belum ada akun terdaftar. Silakan daftar terlebih dahulu.");
+        }
+    }
 
     function loginUser(username) {
         currentUser = username;
         sessionStorage.setItem('fintrack_logged_user', username);
-        document.getElementById('auth-screen').style.setProperty('display', 'none', 'important');
+        sessionStorage.setItem('fintrack_last_user', username);
+        document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'block';
+        initSettings();
         loadUserData();
     }
 
-    async function loadUserData() {
-        try {
-            const res = await fetch(`http://localhost:3000/transactions/${currentUser}`);
-            if (res.ok) transactions = await res.json();
-        } catch (e) {
-            // Local fallback
-            transactions = JSON.parse(localStorage.getItem(`fintrack_db_${currentUser}`)) || [];
+    function loadUserData() {
+        const username = sessionStorage.getItem('fintrack_logged_user');
+        if (!username) return;
+        currentUser = username;
+        transactions = JSON.parse(localStorage.getItem(`fintrack_db_${currentUser}`)) || [];
+        document.getElementById('p-username').value = currentUser;
+        document.getElementById('sidebar-username-display').innerText = "@" + currentUser;
+        const savedProf = JSON.parse(localStorage.getItem(`fintrack_prof_${currentUser}`));
+        if (savedProf) {
+            document.getElementById('p-name').value = savedProf.name || "";
+            document.getElementById('p-job').value = savedProf.job || "";
+            document.getElementById('p-age').value = savedProf.age || "";
+            document.getElementById('sidebar-name-display').innerText = savedProf.name || currentUser;
+        } else {
+            document.getElementById('sidebar-name-display').innerText = currentUser;
         }
+        const savedImg = localStorage.getItem(`fintrack_img_${currentUser}`);
+        const defaultImg = "https://via.placeholder.com/150";
+        document.getElementById('profile-img-display').src = savedImg || defaultImg;
+        document.getElementById('sidebar-img-display').src = savedImg || defaultImg;
+        updateUI();
+    }
 
         // Update Profile
         document.getElementById('p-username').value = currentUser;
