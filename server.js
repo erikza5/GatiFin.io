@@ -60,10 +60,10 @@ app.post('/login', (req, res) => {
 
 // Endpoint untuk Registrasi)
 app.post('/register', async (req, res) => {
-    const { username, email, password, full_name } = req.body;
-    const sql = "INSERT INTO users (username, email, password, full_name) VALUES (?, ?, ?, ?)";
+    const { username, password, full_name } = req.body; // Hapus email
+    const sql = "INSERT INTO users (username, password, full_name) VALUES (?, ?, ?)";
     
-    db.query(sql, [username, email, password, full_name], (err, result) => {
+    db.query(sql, [username, password, full_name], (err, result) => {
         if (err) {
             console.error(err);
             if (err.code === 'ER_DUP_ENTRY') {
