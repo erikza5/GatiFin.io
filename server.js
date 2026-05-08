@@ -3,7 +3,10 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: '*', // Mengizinkan semua akses (cocok untuk testing)
+    methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH']
+}));
 app.use(express.json());
 
 // Konfigurasi Koneksi MariaDB/MySQL
