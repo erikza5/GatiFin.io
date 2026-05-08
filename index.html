@@ -599,11 +599,11 @@
         transaction_date: document.getElementById('date').value // ganti 'date' jadi 'transaction_date'
     };
 
-    await fetch('http://localhost:3000/transactions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    });
+    await fetch('https://gatifinio-production.up.railway.app/transactions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+});
     
     loadUserData();
     this.reset();
@@ -612,7 +612,8 @@
     async function deleteTransaction(id) {
         if (!confirm("Hapus transaksi ini?")) return;
         try {
-            await fetch(`http://localhost:3000/transactions/${id}`, { method: 'DELETE' });
+           await fetch(`https://gatifinio-production.up.railway.app/transactions/${id}`, { 
+    method: 'DELETE'});
         } catch (e) {
             transactions = transactions.filter(t => t.id !== id);
             localStorage.setItem(`fintrack_db_${currentUser}`, JSON.stringify(transactions));
