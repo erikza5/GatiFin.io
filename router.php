@@ -1,11 +1,15 @@
 <?php
 /**
  * Router untuk PHP built-in server di Railway.
- * Struktur: file PHP langsung di root repo (tanpa folder GATIFIN).
+ * Struktur: folder GATIFIN di dalam repo.
  */
 
 $uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
-$docroot = __DIR__;
+$docroot = __DIR__ . '/GATIFIN';
+
+// Set working directory
+chdir($docroot);
+
 $file = $docroot . $uri;
 
 // Serve static files langsung (CSS, JS, gambar, dll)
@@ -17,16 +21,14 @@ if ($uri !== '/' && file_exists($file) && !is_dir($file)) {
 if (is_dir($file)) {
     $index = rtrim($file, '/') . '/index.php';
     if (file_exists($index)) {
-        chdir(dirname($index));
         require $index;
         return true;
     }
 }
 
-// Semua request → index.php di root
+// Semua request → index.php di root GATIFIN
 $target = $docroot . '/index.php';
 if (file_exists($target)) {
-    chdir($docroot);
     require $target;
 } else {
     http_response_code(404);
