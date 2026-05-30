@@ -119,26 +119,7 @@ function getDashboardInsight($total, $top_cat, $gen) {
 $clean_insight = getDashboardInsight($total_pengeluaran, $top_kategori, $generation_type);
 ?>
 
-<style>
-    .glass-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(0,0,0,0.05);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .glass-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important; }
-    .gradient-header { background: linear-gradient(135deg, #006D5B 0%, #008f77 100%); color: white; }
-    .icon-box { width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; border-radius: 16px; }
-    .stat-label { letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.75rem; font-weight: 700; opacity: 0.8; }
-    .border-dashed-custom { border: 2px dashed #cbd5e1; transition: border-color 0.3s; background-color: #f8fafc; }
-    .border-dashed-custom:hover { border-color: #006D5B; background-color: #f1f5f9; }
-    .dashboard-card-custom {
-        border: 1px solid #edf2f7;
-        border-radius: 16px;
-        background-color: #ffffff;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-    }
-</style>
+<!-- Dashboard styles: see assets/css/style.css -->
 
 <div class="container-fluid px-4 py-4">
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4 gap-3">
@@ -146,11 +127,11 @@ $clean_insight = getDashboardInsight($total_pengeluaran, $top_kategori, $generat
             <h3 class="fw-bold text-dark mb-1">Dashboard Keuangan</h3>
             <p class="text-muted mb-0">Selamat datang kembali, pantau kesehatan finansial Anda hari ini.</p>
         </div>
-        <div class="d-flex gap-2 flex-wrap">
-            <button type="button" class="btn btn-warning text-dark fw-semibold btn-sm px-3 py-2" data-bs-toggle="modal" data-bs-target="#modalScanNota">
+        <div class="d-flex gap-2 dash-actions">
+            <button type="button" class="btn btn-warning text-dark fw-semibold px-3 py-2" data-bs-toggle="modal" data-bs-target="#modalScanNota">
                 <i class="fas fa-camera me-2"></i>Scan Nota/Struk
             </button>
-            <button type="button" class="btn text-white fw-semibold btn-sm px-3 py-2" style="background-color: #006D5B; border: none;" data-bs-toggle="modal" data-bs-target="#modalTambahTransaksi">
+            <button type="button" class="btn text-white fw-semibold px-3 py-2" style="background-color:var(--brand);border:none;" data-bs-toggle="modal" data-bs-target="#modalTambahTransaksi">
                 <i class="fas fa-plus me-2"></i>Tambah Manual
             </button>
         </div>
@@ -267,7 +248,7 @@ $clean_insight = getDashboardInsight($total_pengeluaran, $top_kategori, $generat
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow" style="border-radius: 16px;">
             <div class="modal-header border-0 bg-light py-3">
-                <h5 class="modal-title fw-bold" id="modalTambahTransaksiLabel" style="color: #006D5B;">
+                <h5 class="modal-title fw-bold" id="modalTambahTransaksiLabel" style="color:var(--brand);">
                     <i class="fas fa-file-invoice-dollar me-2"></i>Catat Transaksi Baru
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -316,7 +297,7 @@ $clean_insight = getDashboardInsight($total_pengeluaran, $top_kategori, $generat
                 </div>
                 <div class="modal-footer border-0 bg-light p-3">
                     <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal" style="border-radius: 8px;">Batal</button>
-                    <button type="submit" name="simpan_transaksi" class="btn btn-sm text-white px-4 fw-semibold" style="background-color: #006D5B; border-radius: 8px;">Simpan Transaksi</button>
+                    <button type="submit" name="simpan_transaksi" class="btn btn-sm text-white px-4 fw-semibold" style="background:var(--brand);border-radius:var(--radius-md);">Simpan Transaksi</button>
                 </div>
             </form>
         </div>
