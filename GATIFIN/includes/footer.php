@@ -1,10 +1,9 @@
+<!-- Footer inside page-content-wrapper -->
+    <footer class="gf-footer">
+        <span>&copy; <?= date('Y') ?> <strong>GATIFIN</strong> &mdash; Pengelolaan Keuangan Pribadi yang Cerdas &amp; Akurat.</span>
+    </footer>
 </div><!-- /#page-content-wrapper -->
 </div><!-- /#wrapper -->
-
-<!-- Footer -->
-<footer class="gf-footer">
-    <span>&copy; <?= date('Y') ?> <strong>GATIFIN</strong> &mdash; Pengelolaan Keuangan Pribadi yang Cerdas & Akurat.</span>
-</footer>
 
 <!-- JS Libraries -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
