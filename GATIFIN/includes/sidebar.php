@@ -3,7 +3,6 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
 $role = $_SESSION['role'] ?? 'pengguna';
 ?>
 
-
 <div id="sidebar-wrapper">
 
     <div class="sidebar-brand">
