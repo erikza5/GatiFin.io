@@ -1,6 +1,7 @@
 <?php
-// Model default untuk fitur scan struk. Ganti ke gemini-2.5-flash jika model ini tidak tersedia di akun Anda.
+// Model default untuk fitur scan struk.
 define('GEMINI_MODEL', 'gemini-2.5-flash');
-// Masukkan API key Gemini Anda di antara tanda kutip.
-// Contoh: return 'AIzaSy...';
-return 'AQ.Ab8RN6J4WQSCJbc9XSjO3nXurB9rCCbDjKsOunLe-qB2bg9hPg';
+
+// API Key dibaca dari environment variable Railway (lebih aman dari hardcode).
+// Set variable GEMINI_API_KEY di Railway Dashboard > Variables.
+return getenv('GEMINI_API_KEY') ?: '';
