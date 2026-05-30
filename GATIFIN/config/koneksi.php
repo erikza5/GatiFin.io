@@ -16,9 +16,9 @@ if ($database_url) {
     $db_port = $parsed['port'] ?? 3306;
 } else {
     // Fallback ke env vars individual atau lokal
-    $db_host = getenv('MYSQLHOST')     ?: 'localhost';
-    $db_user = getenv('MYSQLUSER')     ?: 'root';
-    $db_pass = getenv('MYSQLPASSWORD') ?: '';
+    $db_host = getenv('MYSQLHOST')     ?: 'gatifin_db';
+    $db_user = getenv('MYSQLUSER')     ?: 'centerbeam.proxy.rlwy.net';
+    $db_pass = getenv('MYSQLPASSWORD') ?: 'HTESIDmSfHZifwXqKyDXdUnHSCokeUZm';
     $db_name = getenv('MYSQLDATABASE') ?: 'Gatfin';
     $db_port = (int)(getenv('MYSQLPORT') ?: 3306);
 }
