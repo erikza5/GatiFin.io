@@ -1,0 +1,18 @@
+[phases.setup]
+nixPkgs = [
+  "php83",
+  "php83Extensions.mysqli",
+  "php83Extensions.mbstring",
+  "php83Extensions.curl",
+  "php83Extensions.gd",
+  "php83Extensions.fileinfo",
+  "php83Extensions.json",
+  "php83Extensions.session",
+  "php83Extensions.openssl"
+]
+
+[phases.build]
+cmds = []
+
+[start]
+cmd = "php -S 0.0.0.0:$PORT -t /app/GATIFIN"
