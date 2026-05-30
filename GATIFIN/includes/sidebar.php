@@ -3,62 +3,6 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
 $role = $_SESSION['role'] ?? 'pengguna';
 ?>
 
-<style>
-    /* Menggunakan flexbox pada wrapper utama agar layout membagi ruang secara sempurna */
-    #wrapper {
-        display: flex;
-        align-items: stretch;
-        width: 100%;
-        height: 100vh;
-        overflow: hidden; /* Mencegah seluruh layar utama melakukan scroll kasar */
-    }
-
-    /* Mengunci posisi sidebar agar tidak ikut tergulung ke atas */
-    #sidebar-wrapper {
-        height: 100vh !important;
-        position: sticky;
-        top: 0;
-        bottom: 0;
-        display: flex;
-        flex-direction: column;
-        z-index: 1000;
-        flex-shrink: 0; /* Mencegah sidebar menyusut secara paksa */
-    }
-
-    /* Memisahkan bagian menu di dalam sidebar agar jika menu terlalu banyak, hanya bagian ini saja yang scroll */
-    .sidebar-content {
-        flex: 1;
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-
-    /* Mengizinkan area konten utama + top navbar untuk melakukan scroll secara independen */
-    #page-content-wrapper {
-        flex: 1;
-        height: 100vh;
-        overflow-y: auto; /* Scroll hanya terjadi di area konten ini */
-        overflow-x: hidden;
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* Memastikan top navbar tetap menempel di atas konten saat di-scroll */
-    .navbar-top {
-        position: sticky;
-        top: 0;
-        z-index: 999;
-        flex-shrink: 0;
-    }
-
-    /* Menghilangkan scrollbar default di dalam sidebar agar tetap estetik (opsional) */
-    .sidebar-content::-webkit-scrollbar {
-        width: 4px;
-    }
-    .sidebar-content::-webkit-scrollbar-thumb {
-        background: rgba(255,255,255,0.1);
-        border-radius: 4px;
-    }
-</style>
 
 <div id="sidebar-wrapper">
 
