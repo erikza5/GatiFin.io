@@ -2,14 +2,10 @@
 session_start();
 require_once "config/koneksi.php";
 if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit; }
+
+include "includes/header.php";
+include "includes/sidebar.php";
 ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<?php include "includes/header.php"; ?>
-</head>
-<body>
-<?php include "includes/sidebar.php"; ?>
 
 <div class="content-body">
     <?php
@@ -28,5 +24,3 @@ if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit; }
 </div>
 
 <?php include "includes/footer.php"; ?>
-</body>
-</html>
