@@ -10,7 +10,7 @@ $db_host = getenv('MYSQLHOST')     ?: 'localhost';
 $db_user = getenv('MYSQLUSER')     ?: 'root';
 $db_pass = getenv('MYSQLPASSWORD') ?: '';
 $db_name = getenv('MYSQLDATABASE') ?: 'gatifin_db';
-$db_port = (int)(getenv('MYSQLPORT') ?: 8080);
+$db_port = (int)(getenv('MYSQLPORT') ?: 3306);
 
 // Mengaktifkan Pelaporan Eror internal MySQLi demi keamanan data
 mysqli_report(MYSQLI_REPORT_OFF);
