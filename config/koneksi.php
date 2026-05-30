@@ -3,14 +3,14 @@
  * GATIFIN - Konfigurasi Koneksi Database Engine
  * Support environment: Lokal (XAMPP) & Railway (Cloud)
  */
-
+mysql://root:HTESIDmSfHZifwXqKyDXdUnHSCokeUZm@centerbeam.proxy.rlwy.net:13066/gatifin_db
 // Konfigurasi Parameter Server Database
 // Railway otomatis mengisi env vars berikut saat MySQL service ditambahkan
-$db_host = getenv('MYSQLHOST')     ?: 'localhost';
+$db_host = getenv('MYSQLHOST')     ?: 'centerbeam.proxy.rlwy.net';
 $db_user = getenv('MYSQLUSER')     ?: 'root';
-$db_pass = getenv('MYSQLPASSWORD') ?: '';
+$db_pass = getenv('MYSQLPASSWORD') ?: 'HTESIDmSfHZifwXqKyDXdUnHSCokeUZm';
 $db_name = getenv('MYSQLDATABASE') ?: 'gatifin_db';
-$db_port = (int)(getenv('MYSQLPORT') ?: 3306);
+$db_port = (int)(getenv('MYSQLPORT') ?: 13066);
 
 // Mengaktifkan Pelaporan Eror internal MySQLi demi keamanan data
 mysqli_report(MYSQLI_REPORT_OFF);
