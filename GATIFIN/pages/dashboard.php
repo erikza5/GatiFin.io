@@ -146,11 +146,11 @@ $clean_insight = getDashboardInsight($total_pengeluaran, $top_kategori, $generat
             <h3 class="fw-bold text-dark mb-1">Dashboard Keuangan</h3>
             <p class="text-muted mb-0">Selamat datang kembali, pantau kesehatan finansial Anda hari ini.</p>
         </div>
-        <div class="d-flex gap-2">
-            <button type="button" class="btn btn-warning text-dark fw-semibold btn-sm px-3 py-2" style="border-radius: 10px;" data-bs-toggle="modal" data-bs-target="#modalScanNota">
+        <div class="d-flex gap-2 flex-wrap">
+            <button type="button" class="btn btn-warning text-dark fw-semibold btn-sm px-3 py-2" data-bs-toggle="modal" data-bs-target="#modalScanNota">
                 <i class="fas fa-camera me-2"></i>Scan Nota/Struk
             </button>
-            <button type="button" class="btn text-white fw-semibold btn-sm px-3 py-2" style="background-color: #006D5B; border: none; border-radius: 10px;" data-bs-toggle="modal" data-bs-target="#modalTambahTransaksi">
+            <button type="button" class="btn text-white fw-semibold btn-sm px-3 py-2" style="background-color: #006D5B; border: none;" data-bs-toggle="modal" data-bs-target="#modalTambahTransaksi">
                 <i class="fas fa-plus me-2"></i>Tambah Manual
             </button>
         </div>
