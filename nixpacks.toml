@@ -6,7 +6,6 @@ nixPkgs = [
   "php83Extensions.curl",
   "php83Extensions.gd",
   "php83Extensions.fileinfo",
-  "php83Extensions.json",
   "php83Extensions.session",
   "php83Extensions.openssl"
 ]
