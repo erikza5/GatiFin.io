@@ -4,6 +4,39 @@ include_once __DIR__ . '/../config/koneksi.php';
 $id_saya = $_SESSION['user_id'] ?? null;
 
 // ══════════════════════════════════════════════
+// 0. AJAX HANDLER: UPLOAD FOTO (MODERN)
+// ══════════════════════════════════════════════
+if (isset($_POST['action']) && $_POST['action'] === 'upload_foto') {
+    header('Content-Type: application/json');
+    if (!$id_saya) {
+        echo json_encode(['status' => 'error', 'message' => 'Sesi berakhir, silakan login kembali.']);
+        exit;
+    }
+
+    $image_data = $_POST['image'] ?? '';
+    if (empty($image_data)) {
+        echo json_encode(['status' => 'error', 'message' => 'Data gambar tidak ditemukan.']);
+        exit;
+    }
+
+    // Validasi format base64
+    if (!preg_match('/^data:image\/(png|jpg|jpeg|webp);base64,/', $image_data)) {
+        echo json_encode(['status' => 'error', 'message' => 'Format gambar tidak valid.']);
+        exit;
+    }
+
+    $image_escaped = mysqli_real_escape_string($koneksi, $image_data);
+    $query = "UPDATE users SET foto = '$image_escaped' WHERE id = '$id_saya'";
+
+    if (mysqli_query($koneksi, $query)) {
+        echo json_encode(['status' => 'success', 'message' => 'Foto profil berhasil diperbarui!', 'image' => $image_data]);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Gagal memperbarui database: ' . mysqli_error($koneksi)]);
+    }
+    exit;
+}
+
+// ══════════════════════════════════════════════
 // 1. PROSES UPDATE PROFIL
 // ══════════════════════════════════════════════
 if (isset($_POST['update_saya'])) {
@@ -121,10 +154,47 @@ if (str_starts_with($foto_val, 'data:')) {
 }
 ?>
 
+<!-- Load External Libraries for Modern Upload -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <style>
 /* ════════════════════════════════════════
    PROFIL PAGE — COMPLETE & MOBILE-READY
 ════════════════════════════════════════ */
+
+/* ── MODAL CROPPER ── */
+.gf-modal {
+    display: none; position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,.7); align-items: center; justify-content: center;
+    padding: 20px; animation: fadeIn .2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.gf-modal-content {
+    background: var(--surface); width: 100%; max-width: 500px;
+    border-radius: var(--radius-lg); overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,.2);
+}
+.gf-modal-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.gf-modal-body { padding: 20px; }
+.crop-container { width: 100%; max-height: 400px; background: #000; border-radius: var(--radius-md); overflow: hidden; }
+.gf-modal-footer {
+    padding: 16px 20px; border-top: 1px solid var(--border);
+    display: flex; justify-content: flex-end; gap: 10px;
+}
+
+/* ── AVATAR LOADING ── */
+.pf-avatar-wrap.loading .pf-avatar { opacity: 0.5; }
+.pf-avatar-wrap.loading::after {
+    content: ""; position: absolute; inset: 0; border-radius: 50%;
+    border: 3px solid transparent; border-top-color: var(--brand);
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* ── ALERT FLASH ── */
 .pf-alert {
@@ -894,30 +964,138 @@ if ($flash):
 
 </div><!-- /row -->
 
+<!-- ════ MODAL CROPPER ════ -->
+<div class="gf-modal" id="modalCropper">
+    <div class="gf-modal-content">
+        <div class="gf-modal-header">
+            <h6 class="fw-bold mb-0">Atur Foto Profil</h6>
+            <button type="button" class="btn-close" onclick="closeCropper()"></button>
+        </div>
+        <div class="gf-modal-body">
+            <div class="crop-container">
+                <img id="imageToCrop" src="" style="max-width: 100%;">
+            </div>
+            <p class="text-muted small mt-3 mb-0">Geser dan sesuaikan foto agar pas dalam lingkaran.</p>
+        </div>
+        <div class="gf-modal-footer">
+            <button type="button" class="btn-gf-secondary" onclick="closeCropper()">Batal</button>
+            <button type="button" class="btn-gf-primary" id="btnCropAndUpload">Terapkan & Unggah</button>
+        </div>
+    </div>
+</div>
+
 <script>
 /* ═══════════════════════════════════════
-   PROFIL PAGE JS
+   PROFIL PAGE JS — MODERN UPLOAD VERSION
 ═══════════════════════════════════════ */
 
-// ── Foto preview ──
-const originalFotoSrc = document.getElementById('preview')?.src || '';
+let cropper;
+const modalCropper = document.getElementById('modalCropper');
+const imageToCrop  = document.getElementById('imageToCrop');
+const uploadInput  = document.getElementById('upload_foto');
+
+// ── Open Cropper Modal when file is selected ──
 function handleFotoPreview(input) {
     if (input.files && input.files[0]) {
-        const url = window.URL.createObjectURL(input.files[0]);
-        const main  = document.getElementById('preview');
-        const thumb = document.getElementById('preview_thumb');
-        if (main)  main.src  = url;
-        if (thumb) thumb.src = url;
+        const file = input.files[0];
+        // Validasi ukuran (2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            Swal.fire('Ukuran Terlalu Besar', 'Maksimal ukuran foto adalah 2MB.', 'warning');
+            input.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            imageToCrop.src = e.target.result;
+            modalCropper.style.display = 'flex';
+            if (cropper) cropper.destroy();
+            cropper = new Cropper(imageToCrop, {
+                aspectRatio: 1,
+                viewMode: 1,
+                dragMode: 'move',
+                autoCropArea: 1,
+                restore: false,
+                guides: true,
+                center: true,
+                highlight: false,
+                cropBoxMovable: true,
+                cropBoxResizable: true,
+                toggleDragModeOnDblclick: false,
+            });
+        };
+        reader.readAsDataURL(file);
     }
 }
-function resetPreview() {
-    const main  = document.getElementById('preview');
-    const thumb = document.getElementById('preview_thumb');
-    if (main)  main.src  = originalFotoSrc;
-    if (thumb) thumb.src = originalFotoSrc;
+
+function closeCropper() {
+    modalCropper.style.display = 'none';
+    uploadInput.value = '';
+    if (cropper) cropper.destroy();
 }
 
-// ── Toggle password visibility ──
+// ── Process Crop and AJAX Upload ──
+document.getElementById('btnCropAndUpload').addEventListener('click', function() {
+    if (!cropper) return;
+
+    const canvas = cropper.getCroppedCanvas({ width: 400, height: 400 });
+    const base64Image = canvas.toDataURL('image/jpeg', 0.8);
+
+    closeCropper();
+    
+    // UI Feedback: Start Loading
+    const avatarWrap = document.querySelector('.pf-avatar-wrap');
+    if (avatarWrap) avatarWrap.classList.add('loading');
+
+    // AJAX Upload
+    const formData = new FormData();
+    formData.append('action', 'upload_foto');
+    formData.append('image', base64Image);
+
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Update all avatar images on page
+            document.getElementById('preview').src = data.image;
+            document.getElementById('preview_thumb').src = data.image;
+            
+            // Sync with sidebar/header if they exist
+            const sideAvatar = document.querySelector('.sidebar-avatar img') || document.querySelector('.user-avatar img');
+            if (sideAvatar) sideAvatar.src = data.image;
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: data.message,
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } else {
+            Swal.fire('Gagal', data.message, 'error');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        Swal.fire('Error', 'Terjadi kesalahan saat mengunggah foto.', 'error');
+    })
+    .finally(() => {
+        if (avatarWrap) avatarWrap.classList.remove('loading');
+    });
+});
+
+// ── Sync Reset Preview ──
+const originalFotoSrc = document.getElementById('preview')?.src || '';
+function resetPreview() {
+    document.getElementById('preview').src = originalFotoSrc;
+    document.getElementById('preview_thumb').src = originalFotoSrc;
+    uploadInput.value = '';
+}
+
+// ── Existing Logic (Password, Tabs, etc.) ──
 document.querySelectorAll('.pw-toggle').forEach(btn => {
     btn.addEventListener('click', () => {
         const inp = document.getElementById(btn.dataset.target);
@@ -928,7 +1106,6 @@ document.querySelectorAll('.pw-toggle').forEach(btn => {
     });
 });
 
-// ── Password strength checker ──
 function strengthScore(val) {
     let s = 0;
     if (val.length >= 6) s++;
@@ -938,6 +1115,7 @@ function strengthScore(val) {
     if (/[^A-Za-z0-9]/.test(val)) s++;
     return s;
 }
+
 function applyStrength(barId, txtId, val) {
     const bar = document.getElementById(barId);
     const txt = document.getElementById(txtId);
@@ -957,8 +1135,10 @@ function applyStrength(barId, txtId, val) {
     txt.textContent = lv.l;
     txt.style.color = lv.c;
 }
+
 function checkPasswordStrength(val)  { applyStrength('pwBar',  'pwTxt',  val); }
 function checkPasswordStrengthD(val) { applyStrength('pwBarD', 'pwTxtD', val); }
+
 function checkConfirm() {
     const b = document.getElementById('pw_baru')?.value;
     const c = document.getElementById('pw_konfirmasi')?.value;
@@ -968,6 +1148,7 @@ function checkConfirm() {
     t.textContent = b === c ? '✓ Password cocok' : '✗ Password tidak cocok';
     t.style.color = b === c ? '#15803D' : '#EF4444';
 }
+
 function checkConfirmD() {
     const b = document.getElementById('pw_baru_d')?.value;
     const c = document.getElementById('pw_konfirmasi_d')?.value;
@@ -978,7 +1159,6 @@ function checkConfirmD() {
     t.style.color = b === c ? '#15803D' : '#EF4444';
 }
 
-// ── Submit profil: loading state ──
 document.getElementById('formEditProfil')?.addEventListener('submit', function() {
     const btn = document.getElementById('btnSimpanProfil');
     if (btn) {
@@ -987,7 +1167,6 @@ document.getElementById('formEditProfil')?.addEventListener('submit', function()
     }
 });
 
-// ── Mobile Tabs ──
 const tabBtns   = document.querySelectorAll('.pf-tab-btn');
 const tabPanels = document.querySelectorAll('.pf-tab-panel');
 tabBtns.forEach(btn => {
@@ -1000,7 +1179,6 @@ tabBtns.forEach(btn => {
     });
 });
 
-// ── Anchor scroll ke password jika ada hash ──
 if (window.location.hash === '#seksi-password') {
     const el = document.getElementById('seksi-password-desktop') || document.getElementById('seksi-password');
     if (el) setTimeout(() => el.scrollIntoView({ behavior:'smooth', block:'start' }), 300);
